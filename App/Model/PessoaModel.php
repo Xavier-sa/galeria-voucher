@@ -31,7 +31,8 @@ class PessoaModel extends BaseModel
         }
 
         $sql = "INSERT INTO pessoa (nome, email, perfil, linkedin, github, imagem_id) 
-                VALUES (:nome, :email, :perfil, :linkedin, :github, :imagem_id)";
+                VALUES (:nome, :email, :perfil, :linkedin, :github, :imagem_id)
+                RETURNING pessoa_id";
 
         try {
             $stmt = $this->pdo->prepare($sql);
@@ -45,7 +46,7 @@ class PessoaModel extends BaseModel
             ]);
 
             // ID da pessoa criada
-            $pessoaId = $this->pdo->lastInsertId();
+            $pessoaId = (int) $stmt->fetchColumn();
 
             // Se for docente, cria o usuário com senha
             if ($dados['perfil'] === 'professor') {
@@ -70,8 +71,8 @@ class PessoaModel extends BaseModel
             $msg  = $e->getMessage();
 
             // Tratamento amigável
-            if ($code === '23000') { // violação de constraint
-                if (stripos($msg, 'Duplicate') !== false || stripos($msg, 'UNIQUE') !== false) {
+            if ($code === '23505') { // unique_violation no PostgreSQL
+                if (stripos($msg, 'unique') !== false) {
                     $this->ultimoErro = 'E-mail já cadastrado.';
                 } else {
                     $this->ultimoErro = 'Violação de restrição no banco.';
@@ -168,7 +169,7 @@ class PessoaModel extends BaseModel
             $del = $this->pdo->prepare("DELETE FROM aluno_turma WHERE pessoa_id = :id");
             $del->execute([':id' => $pessoaId]);
             if ($turmaId !== null) {
-                $ins = $this->pdo->prepare("INSERT INTO aluno_turma (pessoa_id, turma_id, data_matricula) VALUES (:pid, :tid, CURDATE())");
+                $ins = $this->pdo->prepare("INSERT INTO aluno_turma (pessoa_id, turma_id, data_matricula) VALUES (:pid, :tid, CURRENT_DATE)");
                 $ins->execute([':pid' => $pessoaId, ':tid' => $turmaId]);
             }
             $this->pdo->commit();
@@ -187,7 +188,7 @@ class PessoaModel extends BaseModel
             $del = $this->pdo->prepare("DELETE FROM docente_turma WHERE pessoa_id = :id");
             $del->execute([':id' => $pessoaId]);
             if ($turmaId !== null) {
-                $ins = $this->pdo->prepare("INSERT INTO docente_turma (pessoa_id, turma_id, data_associacao) VALUES (:pid, :tid, CURDATE())");
+                $ins = $this->pdo->prepare("INSERT INTO docente_turma (pessoa_id, turma_id, data_associacao) VALUES (:pid, :tid, CURRENT_DATE)");
                 $ins->execute([':pid' => $pessoaId, ':tid' => $turmaId]);
             }
             $this->pdo->commit();
@@ -344,7 +345,7 @@ class PessoaModel extends BaseModel
             LEFT JOIN
                 polo ON t.polo_id = polo.polo_id
             GROUP BY
-                p.pessoa_id
+                p.pessoa_id, polo.nome
             ORDER BY
                 p.nome ASC
         ";
@@ -379,9 +380,9 @@ class PessoaModel extends BaseModel
             LEFT JOIN
                 polo ON t.polo_id = polo.polo_id
             WHERE
-                p.nome LIKE :termo OR polo.nome LIKE :termo
+                p.nome ILIKE :termo OR polo.nome ILIKE :termo
             GROUP BY
-                p.pessoa_id
+                p.pessoa_id, polo.nome
             ORDER BY
                 p.nome ASC
         ";
@@ -408,7 +409,7 @@ class PessoaModel extends BaseModel
 
         $params = [];
         if (!empty($termo)) {
-            $query .= " WHERE p.nome LIKE :termo OR polo.nome LIKE :termo";
+            $query .= " WHERE p.nome ILIKE :termo OR polo.nome ILIKE :termo";
             $params[':termo'] = '%' . $termo . '%';
         }
 
@@ -447,11 +448,11 @@ class PessoaModel extends BaseModel
 
         $params = [];
         if (!empty($termo)) {
-            $query .= " WHERE p.nome LIKE :termo OR polo.nome LIKE :termo";
+            $query .= " WHERE p.nome ILIKE :termo OR polo.nome ILIKE :termo";
             $params[':termo'] = '%' . $termo . '%';
         }
 
-        $query .= " GROUP BY p.pessoa_id ORDER BY p.nome ASC LIMIT :limite OFFSET :offset";
+        $query .= " GROUP BY p.pessoa_id, polo.nome ORDER BY p.nome ASC LIMIT :limite OFFSET :offset";
 
         $stmt = $this->pdo->prepare($query);
 

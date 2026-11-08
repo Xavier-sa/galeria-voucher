@@ -43,7 +43,8 @@ class ProjetoModel extends BaseModel
      */
     public function buscarDiasProjeto(int $projetoId): array
     {
-        $sql = "SELECT * FROM projeto_dia WHERE projeto_id = :projeto_id ORDER BY FIELD(tipo_dia, 'I', 'P', 'E')";
+        $sql = "SELECT * FROM projeto_dia WHERE projeto_id = :projeto_id
+                ORDER BY CASE tipo_dia WHEN 'I' THEN 1 WHEN 'P' THEN 2 WHEN 'E' THEN 3 END";
         try {
             $stmt = $this->pdo->prepare($sql);
             $stmt->bindParam(':projeto_id', $projetoId, PDO::PARAM_INT);
@@ -81,7 +82,8 @@ class ProjetoModel extends BaseModel
             throw new Exception("Chave estrangeira inválida: Turma ID {$turmaId} não existe.");
         }
 
-        $sqlProjeto = "INSERT INTO {$this->tabela} (nome, descricao, link, turma_id) VALUES (:nome, :descricao, :link, :turma_id)";
+        $sqlProjeto = "INSERT INTO {$this->tabela} (nome, descricao, link, turma_id)
+                       VALUES (:nome, :descricao, :link, :turma_id) RETURNING projeto_id";
         $stmtProjeto = $this->pdo->prepare($sqlProjeto);
         $executou = $stmtProjeto->execute([
             ':nome' => $nome,
@@ -95,7 +97,7 @@ class ProjetoModel extends BaseModel
             throw new Exception("Falha SQL ao inserir projeto: " . ($errorInfo[2] ?? 'Erro desconhecido.'));
         }
 
-        $projetoId = (int) $this->pdo->lastInsertId();
+        $projetoId = (int) $stmtProjeto->fetchColumn();
         if ($projetoId === 0) {
             throw new Exception("Falha ao obter ID do projeto inserido.");
         }
@@ -119,7 +121,8 @@ class ProjetoModel extends BaseModel
         }
 
         error_log("[_inserirProjetoDia] Inserindo Dia '{$tipoDia}' para Projeto ID {$projetoId}.");
-        $sqlDia = "INSERT INTO projeto_dia (tipo_dia, descricao, projeto_id) VALUES (:tipo_dia, :descricao, :projeto_id)";
+        $sqlDia = "INSERT INTO projeto_dia (tipo_dia, descricao, projeto_id)
+                   VALUES (:tipo_dia, :descricao, :projeto_id) RETURNING projeto_dia_id";
         $stmtDia = $this->pdo->prepare($sqlDia);
         $executou = $stmtDia->execute([
             ':tipo_dia' => $tipoDia,
@@ -132,7 +135,7 @@ class ProjetoModel extends BaseModel
             throw new Exception("Falha SQL ao inserir dia {$tipoDia}: " . ($errorInfo[2] ?? 'Erro desconhecido.'));
         }
 
-        $projetoDiaId = (int) $this->pdo->lastInsertId();
+        $projetoDiaId = (int) $stmtDia->fetchColumn();
         if ($projetoDiaId === 0) {
             throw new Exception("Falha ao obter ID do dia {$tipoDia} inserido.");
         }
@@ -295,7 +298,7 @@ class ProjetoModel extends BaseModel
             if (!preg_match('/^[a-zA-Z0-9_]+$/', $tabela) || !preg_match('/^[a-zA-Z0-9_]+$/', $coluna)) {
                 throw new InvalidArgumentException("Nome de tabela ou coluna inválido para verificação: {$tabela}.{$coluna}");
             }
-            $sql = "SELECT 1 FROM `{$tabela}` WHERE `{$coluna}` = :id LIMIT 1";
+            $sql = "SELECT 1 FROM {$tabela} WHERE {$coluna} = :id LIMIT 1";
             $stmt = $this->pdo->prepare($sql);
             $stmt->bindParam(':id', $id, PDO::PARAM_INT);
             $stmt->execute();

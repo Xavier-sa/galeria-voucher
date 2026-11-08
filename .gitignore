@@ -1,5 +1,7 @@
 # Envs
 .config
+.env
+.env.local
 
 
 Uploads/*

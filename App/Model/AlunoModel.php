@@ -51,7 +51,7 @@ class AlunoModel extends BaseModel{
             WHERE
                 p.perfil = 'aluno'
             GROUP BY
-                p.pessoa_id
+                p.pessoa_id, polo.nome
             ORDER BY
                 p.nome ASC
         ";
@@ -114,6 +114,27 @@ class AlunoModel extends BaseModel{
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Lista os alunos das turmas habilitadas para a página de desenvolvedores.
+     * A consulta não depende de IDs fixos e evita repetir uma pessoa vinculada
+     * a mais de uma turma marcada para exibição.
+     */
+    public function buscarDesenvolvedores(): array
+    {
+        $sql = "SELECT DISTINCT p.*, i.url AS foto
+                FROM aluno_turma at
+                INNER JOIN pessoa p ON at.pessoa_id = p.pessoa_id
+                INNER JOIN turma t ON at.turma_id = t.turma_id
+                LEFT JOIN imagem i ON p.imagem_id = i.imagem_id
+                WHERE p.perfil = 'aluno'
+                  AND t.exibir_pagina_dev = 1
+                ORDER BY p.nome ASC";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
       /**
      * Desvincula um aluno de uma turma específica
      * @param int $pessoa_id ID da pessoa (aluno)
@@ -138,7 +159,7 @@ class AlunoModel extends BaseModel{
     {
         $query = "SELECT p.pessoa_id, p.nome 
                   FROM pessoa p 
-                  WHERE nome LIKE :nome 
+                  WHERE nome ILIKE :nome
                   AND p.perfil = 'aluno'
                   AND p.pessoa_id NOT IN (SELECT pessoa_id FROM aluno_turma)
                   ";
@@ -171,7 +192,7 @@ class AlunoModel extends BaseModel{
         $params = [':turma_id' => $turma_id];
         
         if (!empty($termo)) {
-            $query .= " AND (p.nome LIKE :termo OR polo.nome LIKE :termo)";
+            $query .= " AND (p.nome ILIKE :termo OR polo.nome ILIKE :termo)";
             $params[':termo'] = '%' . $termo . '%';
         }
 
@@ -221,7 +242,7 @@ class AlunoModel extends BaseModel{
         $params = [':turma_id' => $turma_id];
         
         if (!empty($termo)) {
-            $query .= " AND (p.nome LIKE :termo OR polo.nome LIKE :termo)";
+            $query .= " AND (p.nome ILIKE :termo OR polo.nome ILIKE :termo)";
             $params[':termo'] = '%' . $termo . '%';
         }
 

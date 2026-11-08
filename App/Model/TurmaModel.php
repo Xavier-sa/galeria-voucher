@@ -30,6 +30,7 @@ class TurmaModel extends BaseModel
                 INSERT INTO " . $this->tabela . " 
                 (nome, descricao, data_inicio, data_fim, polo_id, imagem_id) 
                 VALUES (:nome, :descricao, :data_inicio, :data_fim, :polo_id, :imagem_id)
+                RETURNING turma_id
             ";
 
             $stmt = $this->pdo->prepare($query);
@@ -44,8 +45,7 @@ class TurmaModel extends BaseModel
 
             $stmt->execute();
 
-            // Retorna o ID do último registro inserido.
-            return $this->pdo->lastInsertId();
+            return (int) $stmt->fetchColumn();
         } catch (PDOException $e) {
             error_log("Erro ao criar turma: " . $e->getMessage());
             return false;
@@ -94,7 +94,7 @@ class TurmaModel extends BaseModel
             JOIN 
                 polo p ON t.polo_id = p.polo_id
             WHERE 
-                t.nome LIKE :termo OR p.nome LIKE :termo
+                t.nome ILIKE :termo OR p.nome ILIKE :termo
             ORDER BY 
                 t.nome ASC
         ";
@@ -274,7 +274,7 @@ class TurmaModel extends BaseModel
                   JOIN polo p ON t.polo_id = p.polo_id";
 
         if (!empty($termo)) {
-            $query .= " WHERE t.nome LIKE :termo OR p.nome LIKE :termo";
+            $query .= " WHERE t.nome ILIKE :termo OR p.nome ILIKE :termo";
         }
 
         $stmt = $this->pdo->prepare($query);
@@ -309,7 +309,7 @@ class TurmaModel extends BaseModel
         ";
 
         if (!empty($termo)) {
-            $query .= " WHERE t.nome LIKE :termo OR p.nome LIKE :termo";
+            $query .= " WHERE t.nome ILIKE :termo OR p.nome ILIKE :termo";
         }
 
         $query .= " ORDER BY t.nome ASC LIMIT :limite OFFSET :offset";

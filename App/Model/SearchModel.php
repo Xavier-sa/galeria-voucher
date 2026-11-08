@@ -23,7 +23,7 @@ class SearchModel extends BaseModel
                t.nome AS titulo,
                t.descricao AS descricao
         FROM turma t
-        WHERE t.nome LIKE :q OR t.descricao LIKE :q
+        WHERE t.nome ILIKE :q OR t.descricao ILIKE :q
         ORDER BY t.nome ASC
         LIMIT :lt
     ";
@@ -54,8 +54,8 @@ class SearchModel extends BaseModel
                 SELECT pessoa_id, turma_id FROM docente_turma
             ) AS pt ON pt.pessoa_id = p.pessoa_id
 
-            WHERE p.nome LIKE :q
-            GROUP BY p.pessoa_id
+            WHERE p.nome ILIKE :q
+            GROUP BY p.pessoa_id, pt.turma_id
             ORDER BY p.nome ASC
             LIMIT :lp
         ";

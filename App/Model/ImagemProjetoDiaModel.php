@@ -74,7 +74,7 @@ class ImagemProjetoDiaModel extends BaseModel
 
         } catch (PDOException $e) {
             error_log("[associarImagemDia] ERRO PDOException: Código: " . $e->getCode() . " | Mensagem: " . $e->getMessage() . " | Trace: " . $e->getTraceAsString());
-            if ($e->getCode() == '23000') {
+            if ($e->getCode() === '23505') {
                  error_log("[associarImagemDia] Aviso: Tentativa de inserir associação duplicada para imagem ID {$imagemId} e dia ID {$projetoDiaId}.");
                  // return true; // Decide if duplicates are allowed or should be treated as success
             }

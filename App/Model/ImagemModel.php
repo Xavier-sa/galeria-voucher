@@ -43,7 +43,8 @@ class ImagemModel extends BaseModel
         try {
 
             $sql = "INSERT INTO imagem (url, text, descricao, data_upload)
-                VALUES (:url, :text, :descricao, NOW())";
+                VALUES (:url, :text, :descricao, NOW())
+                RETURNING imagem_id";
 
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([
@@ -51,7 +52,7 @@ class ImagemModel extends BaseModel
                 ':text' => $text,
                 ':descricao' => $descricao
             ]);
-            return (int) $this->pdo->lastInsertId(); // Retorna o ID da imagem criada
+            return (int) $stmt->fetchColumn();
         } catch (PDOException $e) {
             error_log("Erro ao criar imagem: " . $e->getMessage());
             throw $e;

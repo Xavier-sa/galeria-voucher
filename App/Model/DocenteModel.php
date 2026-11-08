@@ -30,7 +30,7 @@ class DocenteModel extends BaseModel {
             WHERE
                 p.perfil = 'professor'
             GROUP BY
-                p.pessoa_id
+                p.pessoa_id, polo.nome
             ORDER BY 
                 p.nome ASC
         ";
@@ -45,7 +45,7 @@ class DocenteModel extends BaseModel {
     {
         $query = "SELECT p.pessoa_id, p.nome 
                   FROM pessoa p 
-                  where nome LIKE :nome 
+                  where nome ILIKE :nome
                   AND p.perfil = 'professor'
                   AND p.pessoa_id NOT IN (SELECT pessoa_id FROM docente_turma dt where dt.turma_id = :turma_id)
                   ";
@@ -82,7 +82,7 @@ class DocenteModel extends BaseModel {
             WHERE
                 p.perfil = 'professor' AND t.turma_id = :id
             GROUP BY
-                p.pessoa_id
+                p.pessoa_id, polo.nome
             ORDER BY 
                 p.nome ASC
         ";
@@ -146,7 +146,7 @@ class DocenteModel extends BaseModel {
         $params = [':turma_id' => $turma_id];
         
         if (!empty($termo)) {
-            $query .= " AND (p.nome LIKE :termo OR polo.nome LIKE :termo)";
+            $query .= " AND (p.nome ILIKE :termo OR polo.nome ILIKE :termo)";
             $params[':termo'] = '%' . $termo . '%';
         }
 
@@ -196,7 +196,7 @@ class DocenteModel extends BaseModel {
         $params = [':turma_id' => $turma_id];
         
         if (!empty($termo)) {
-            $query .= " AND (p.nome LIKE :termo OR polo.nome LIKE :termo)";
+            $query .= " AND (p.nome ILIKE :termo OR polo.nome ILIKE :termo)";
             $params[':termo'] = '%' . $termo . '%';
         }
 
