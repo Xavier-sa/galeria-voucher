@@ -65,10 +65,17 @@ git clone https://github.com/VoucherDesenvSenacHub/galeria-voucher.git
 # Acesse o diretório do projeto
 cd galeria-voucher
 
-# Inicie seu servidor local
-# e acesse no navegador:
-http://localhost/galeria-voucher
+# Crie a configuração local (não versionada)
+cp .env.example .env.local
+
+# Inicie o servidor embutido do PHP
+php -S localhost:8000
 ```
+
+Acesse `http://localhost:8000`. O PHP precisa da extensão `pdo_pgsql` habilitada.
+Preencha `DATABASE_URL` em `.env.local` com a connection string do Neon. Como
+alternativa, use as variáveis `DB_*`; `DB_SSLMODE=require` é obrigatório. Para Apache/XAMPP, `APP_URL=auto`
+detecta automaticamente o subdiretório do projeto.
 ## 👥 Colaboradores
 [![Anuar El](https://github.com/AnuarRezz.png?size=50)](https://github.com/AnuarRezz)
 [![Bruno Ribeiro](https://github.com/brunoDevfull.png?size=50)](https://github.com/brunoDevfull)
