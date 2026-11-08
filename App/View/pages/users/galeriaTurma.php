@@ -61,7 +61,7 @@ headerComponent('Galeria da Turma');
                 </section>
         
                 <section class="galeria-turma-tab-inner">
-                    <img class="galeria-turma-imagem-direita" src="<?= htmlspecialchars($imagemTurmaUrl) ?>" alt="Imagem da Turma">
+                    <img class="galeria-turma-imagem-direita" src="<?= htmlspecialchars($imagemTurmaUrl) ?>" onerror="<?= fallbackImagemOnError('App/View/assets/img/turmas/turma.jpg') ?>" alt="Imagem da Turma">
                     <div class="galeria-turma-margin-top-left-projeto1-dia-i">
                         <h2><?= htmlspecialchars($nomeTurma) ?></h2>
                         <p><?= nl2br(htmlspecialchars($descricaoTurma)) ?></p>
@@ -115,7 +115,7 @@ headerComponent('Galeria da Turma');
                                                 </div>
                                                 <div class="galeria-turma-tab-image">
                                                     <?php foreach (($dia['imagens'] ?? []) as $img): ?>
-                                                        <img src="<?= htmlspecialchars($img['url']) ?>" alt="<?= htmlspecialchars($img['alt']) ?>">
+                                                        <img src="<?= htmlspecialchars($img['url']) ?>" onerror="<?= fallbackImagemOnError() ?>" alt="<?= htmlspecialchars($img['alt']) ?>">
                                                     <?php endforeach; ?>
                                                 </div>
                                             </div>

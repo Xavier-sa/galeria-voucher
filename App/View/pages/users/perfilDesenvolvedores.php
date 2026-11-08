@@ -3,10 +3,7 @@ require_once __DIR__ . "/../../componentes/head.php";
 require __DIR__ . "/../../../Model/AlunoModel.php";
 
 $alunoModel = new AlunoModel();
-$alunos = $alunoModel->buscarPorTurma(25);
-
-$pessoasTurma = [];
-$pessoasTurma = array_merge($pessoasTurma, $alunos);
+$pessoasTurma = $alunoModel->buscarDesenvolvedores();
 
 headerComponent('Desenvolvedores');
 ?>
@@ -28,9 +25,13 @@ headerComponent('Desenvolvedores');
             <section class="galeria-turma-cardss">
                 <h1 class="galeria-turma-h1">Alunos</h1>
                 <div class="galeria-turma-container">
-                    <?php foreach ($pessoasTurma as $pessoa): ?>
-                        <?php include __DIR__ . "/../../componentes/users/cardPessoa.php"; ?>
-                    <?php endforeach; ?>
+                    <?php if (empty($pessoasTurma)): ?>
+                        <p>Nenhum desenvolvedor cadastrado para exibição.</p>
+                    <?php else: ?>
+                        <?php foreach ($pessoasTurma as $pessoa): ?>
+                            <?php include __DIR__ . "/../../componentes/users/cardPessoa.php"; ?>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </div>
             </section>
     

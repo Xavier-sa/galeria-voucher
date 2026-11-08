@@ -41,7 +41,7 @@ $turmasPagina = array_slice($turmas, $inicio, $itensPorPagina);
                         <a href="<?= Config::getDirUser() ?>galeriaTurma.php?id=<?= $turma['turma_id'] ?>" class="card-turma">
                             <div class="card-content">
                                 <h3 class="card-title"><?= htmlspecialchars($turma['nome_turma']) ?></h3>
-                                <img class="card-image" src="<?= Config::getAppUrl() . $turma['imagem_url'] ?>" alt="Imagem turma <?= htmlspecialchars($turma['nome_turma']) ?>">
+                                <img class="card-image" src="<?= htmlspecialchars(urlImagem($turma['imagem_url'], 'App/View/assets/img/turmas/turma.jpg')) ?>" onerror="<?= fallbackImagemOnError('App/View/assets/img/turmas/turma.jpg') ?>" alt="Imagem turma <?= htmlspecialchars($turma['nome_turma']) ?>">
                             </div>
                         </a>
                     <?php endforeach; ?>

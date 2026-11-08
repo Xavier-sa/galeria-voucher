@@ -21,7 +21,7 @@ $paginaAtiva = 'home';
     <main class="content-adm layout-main">
       <div class="user-profile-adm">
         <div>
-          <img class="img-Adm" src="<?= Config::getAppUrl() . $usuarioImagem ?>" alt="Foto de <?= $usuarioNome ?>">
+          <img class="img-Adm" src="<?= htmlspecialchars(urlImagem($usuarioImagem, 'App/View/assets/img/adm/fallbackAdm.png')) ?>" onerror="<?= fallbackImagemOnError('App/View/assets/img/adm/fallbackAdm.png') ?>" alt="Foto de <?= htmlspecialchars($usuarioNome) ?>">
         </div>
         <div class="welcome-message-adm">
           BEM VINDO

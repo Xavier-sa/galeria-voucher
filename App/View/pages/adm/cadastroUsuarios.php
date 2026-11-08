@@ -30,10 +30,7 @@ if ($acao === 'editar' && $pessoa && !empty($pessoa['imagem_id'])) {
     $imagem = $imagemModel->buscarImagemPorId((int)$pessoa['imagem_id']);
 
     if ($imagem && !empty($imagem['url'])) {
-        $caminhoFisico = ROOT_PATH . '/' . $imagem['url'];
-        if (file_exists($caminhoFisico)) {
-            $caminhoImagem = Config::getAppUrl() . $imagem['url'];
-        }
+        $caminhoImagem = urlImagem($imagem['url'], 'App/View/assets/img/utilitarios/avatar.png');
     }
 }
 ?>
@@ -85,7 +82,7 @@ if ($acao === 'editar' && $pessoa && !empty($pessoa['imagem_id'])) {
                     
                     <div class="input-file-cadastro">
                             <label for="fileInput">
-                            <img id="preview" src="<?= htmlspecialchars($caminhoImagem) ?>" alt="Upload" />
+                            <img id="preview" src="<?= htmlspecialchars($caminhoImagem) ?>" onerror="<?= fallbackImagemOnError('App/View/assets/img/utilitarios/avatar.png') ?>" alt="Upload" />
                             <input type="file"  name="imagem" id="fileInput" accept="image/*" style="width:0; overflow: hidden;">
                             
                         </label>

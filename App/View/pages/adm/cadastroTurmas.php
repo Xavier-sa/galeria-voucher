@@ -38,7 +38,7 @@ if ($turmaId) {
     if (!empty($turma['imagem_id'])) {
         $url = $turmaModel->buscarUrlDaImagem($turma['imagem_id']);
         if ($url) {
-            $imagemUrl = Config::getAppUrl() . $url;
+            $imagemUrl = urlImagem($url, 'App/View/assets/img/turmas/turma.jpg');
         }
     }
 }
@@ -114,7 +114,7 @@ $currentTab = 'Dados-gerais';
               <!-- <small>Clique na imagem para alterar</small> -->
               <label for="imagem_turma" style="cursor: pointer;">
                 Clique na imagem para alterar
-                <img id="preview" src="<?= htmlspecialchars($imagemUrl) ?>" alt="Upload de Imagem">
+                <img id="preview" src="<?= htmlspecialchars($imagemUrl) ?>" onerror="<?= fallbackImagemOnError('App/View/assets/img/turmas/turma.jpg') ?>" alt="Upload de Imagem">
               </label>
               <input type="file" id="imagem_turma" name="imagem_turma" accept="image/*" style="display: none;">
             </div>

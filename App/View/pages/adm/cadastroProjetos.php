@@ -154,7 +154,7 @@ require_once __DIR__ . "/../../componentes/nav.php";
                     $imgI = $dias['I']['imagem'] ?: "App/View/assets/img/utilitarios/sem-foto.svg";
                     ?>
 
-                        <img src="<?= Config::getAppUrl() . $imgI ?>" alt="Preview Dia I"
+                        <img src="<?= htmlspecialchars(urlImagem($imgI)) ?>" onerror="<?= fallbackImagemOnError() ?>" alt="Preview Dia I"
                             class="foto-projetoturma-novo preview-imagem" id="preview-dia-i" style="cursor: pointer;">
                     </label>
 
@@ -181,7 +181,7 @@ require_once __DIR__ . "/../../componentes/nav.php";
                     $imgP = $dias['P']['imagem'] ?: "App/View/assets/img/utilitarios/sem-foto.svg";
                     ?>
 
-                        <img src="<?= Config::getAppUrl() . $imgP ?>" alt="Preview Dia P"
+                        <img src="<?= htmlspecialchars(urlImagem($imgP)) ?>" onerror="<?= fallbackImagemOnError() ?>" alt="Preview Dia P"
                             class="foto-projetoturma-novo preview-imagem" id="preview-dia-p" style="cursor: pointer;">
                     </label>
 
@@ -208,7 +208,7 @@ require_once __DIR__ . "/../../componentes/nav.php";
                     $imgE = $dias['E']['imagem'] ?: "App/View/assets/img/utilitarios/sem-foto.svg";
                     ?>
 
-                        <img src="<?= Config::getAppUrl() . $imgE ?>" alt="Preview Dia E"
+                        <img src="<?= htmlspecialchars(urlImagem($imgE)) ?>" onerror="<?= fallbackImagemOnError() ?>" alt="Preview Dia E"
                             class="foto-projetoturma-novo preview-imagem" id="preview-dia-e" style="cursor: pointer;">
                     </label>
 

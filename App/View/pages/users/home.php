@@ -129,7 +129,7 @@ try {
                             foreach ($turmas_slice1 as $turma): ?>
                                 <div class='image-turma'>
                                     <a href="<?= Config::getDirUser() ?>galeriaTurma.php?id=<?= htmlspecialchars($turma['turma_id']) ?>">
-                                        <img src="<?= Config::getAppUrl() . htmlspecialchars($turma['imagem_url']) ?>" alt="Imagem da <?= htmlspecialchars($turma['nome_turma']) ?>">
+                                        <img src="<?= htmlspecialchars(urlImagem($turma['imagem_url'], 'App/View/assets/img/turmas/turma.jpg')) ?>" onerror="<?= fallbackImagemOnError('App/View/assets/img/turmas/turma.jpg') ?>" alt="Imagem da <?= htmlspecialchars($turma['nome_turma']) ?>">
                                     </a>
                                 </div>
                             <?php endforeach; ?>
@@ -141,7 +141,7 @@ try {
                             foreach ($turmas_slice2 as $turma): ?>
                                 <div class='image-turma'>
                                     <a href="<?= Config::getDirUser() ?>galeriaTurma.php?id=<?= htmlspecialchars($turma['turma_id']) ?>">
-                                        <img src="<?= Config::getAppUrl() . htmlspecialchars($turma['imagem_url']) ?>" alt="Imagem da <?= htmlspecialchars($turma['nome_turma']) ?>">
+                                        <img src="<?= htmlspecialchars(urlImagem($turma['imagem_url'], 'App/View/assets/img/turmas/turma.jpg')) ?>" onerror="<?= fallbackImagemOnError('App/View/assets/img/turmas/turma.jpg') ?>" alt="Imagem da <?= htmlspecialchars($turma['nome_turma']) ?>">
                                     </a>
                                 </div>
                             <?php endforeach; ?>
@@ -153,7 +153,7 @@ try {
                             foreach ($turmas_slice3 as $turma): ?>
                                 <div class='image-turma'>
                                     <a href="<?= Config::getDirUser() ?>galeriaTurma.php?id=<?= htmlspecialchars($turma['turma_id']) ?>">
-                                        <img src="<?= Config::getAppUrl() . htmlspecialchars($turma['imagem_url']) ?>" alt="Imagem da <?= htmlspecialchars($turma['nome_turma']) ?>">
+                                        <img src="<?= htmlspecialchars(urlImagem($turma['imagem_url'], 'App/View/assets/img/turmas/turma.jpg')) ?>" onerror="<?= fallbackImagemOnError('App/View/assets/img/turmas/turma.jpg') ?>" alt="Imagem da <?= htmlspecialchars($turma['nome_turma']) ?>">
                                     </a>
                                 </div>
                             <?php endforeach; ?>

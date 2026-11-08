@@ -15,21 +15,12 @@ if (!isset($pessoa) || !is_array($pessoa)) {
     ];
 }
 
-// Configura o caminho da foto
-if (!empty($pessoa['foto'])) {
-    if (filter_var($pessoa['foto'], FILTER_VALIDATE_URL)) {
-        $caminhoFoto = $pessoa['foto'];
-    } else {
-        $caminhoFoto = Config::getAppUrl() . $pessoa['foto'];
-    }
-} else {
-    $caminhoFoto = Config::getDirImg() . 'utilitarios/avatar.png';
-}
+$caminhoFoto = urlImagem($pessoa['foto'] ?? null, 'App/View/assets/img/utilitarios/avatar.png');
 ?>
 
 <div class="card-container">
     <div class="image-dev">
-        <img src="<?= htmlspecialchars($caminhoFoto); ?>" alt="Foto de <?= htmlspecialchars($pessoa['nome']); ?>">
+        <img src="<?= htmlspecialchars($caminhoFoto); ?>" onerror="<?= fallbackImagemOnError('App/View/assets/img/utilitarios/avatar.png') ?>" alt="Foto de <?= htmlspecialchars($pessoa['nome']); ?>">
     </div>
     <div class="text-card">
         <h2><?= htmlspecialchars($pessoa['nome']); ?></h2>

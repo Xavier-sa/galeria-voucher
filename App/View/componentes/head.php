@@ -5,6 +5,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 require_once __DIR__ . '/../../Config/Config.php';
 require_once __DIR__ . '/../../Helpers/Request.php';
+require_once __DIR__ . '/../../Helpers/ImageHelper.php';
 require_once __DIR__ . '/input.php';
 require_once __DIR__ . '/button.php';
 
@@ -14,6 +15,7 @@ require_once __DIR__ . '/button.php';
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="<?= Config::getDirImg() ?>utilitarios/favicon.png">
 <link rel="stylesheet" href="<?= Config::getDirCss() ?>globals.css">
 <link rel="stylesheet" href="<?= Config::getDirCss() ?>adm/modal-cadastro.css">
 
