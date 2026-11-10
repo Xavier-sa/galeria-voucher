@@ -22,15 +22,15 @@ class Database
         $databaseUrl = $value('DATABASE_URL', '');
         $connectionOptions = '';
 
-        if ($connection !== 'pgsql') {
-            throw new RuntimeException("DB_CONNECTION deve ser 'pgsql' para usar o Neon PostgreSQL.");
+        if (!in_array($connection, ['pgsql', 'mysql'], true)) {
+            throw new RuntimeException("DB_CONNECTION deve ser 'pgsql' ou 'mysql'.");
         }
 
-        if (!in_array('pgsql', PDO::getAvailableDrivers(), true)) {
-            throw new RuntimeException('O driver PDO PostgreSQL (pdo_pgsql) não está instalado ou habilitado no PHP.');
+        if (!in_array($connection, PDO::getAvailableDrivers(), true)) {
+            throw new RuntimeException("O driver PDO {$connection} não está instalado ou habilitado no PHP.");
         }
 
-        if (trim($databaseUrl) !== '') {
+        if ($connection === 'pgsql' && trim($databaseUrl) !== '') {
             $databaseUrl = trim($databaseUrl, " \t\n\r\0\x0B\"'");
             $parts = parse_url($databaseUrl);
             if ($parts === false || !isset($parts['host'], $parts['path'], $parts['user'])) {
@@ -67,8 +67,10 @@ class Database
                 }
             }
 
-            $dsn = "pgsql:host={$host};port={$port};dbname={$dbname};sslmode={$sslmode};connect_timeout=10";
-            if ($connectionOptions !== '') {
+            $dsn = $connection === 'mysql'
+                ? "mysql:host={$host};port={$port};dbname={$dbname};charset=utf8mb4;connect_timeout=10"
+                : "pgsql:host={$host};port={$port};dbname={$dbname};sslmode={$sslmode};connect_timeout=10";
+            if ($connection === 'pgsql' && $connectionOptions !== '') {
                 if (preg_match('/[;\r\n]/', $connectionOptions)) {
                     throw new RuntimeException('Configuração inválida para options.');
                 }
