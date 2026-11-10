@@ -83,8 +83,8 @@ $is_admin = isset($_SESSION['usuario']) && $_SESSION['usuario']['perfil'] === 'a
                         <?php foreach ($projetos as $projeto): ?>
                         <tr>
                             <td><?= htmlspecialchars($projeto['projeto_id']) ?></td>
-                            <td><?= htmlspecialchars($projeto['nome_projeto']) ?></td>
-                            <td><?= htmlspecialchars(mb_strimwidth($projeto['descricao_projeto'] ?? '', 0, 100, "...")) ?>
+                            <td><?= htmlspecialchars($projeto['nome_projeto'] ?? $projeto['NOME_PROJETO']) ?></td>
+                            <td><?= htmlspecialchars(mb_strimwidth($projeto['descricao_projeto'] ?? $projeto['DESCRICAO_PROJETO'] ?? '', 0, 100, "...")) ?>
                             </td>
                             <td class="acoes">
                                 <div class="acoes-container">
@@ -95,7 +95,7 @@ $is_admin = isset($_SESSION['usuario']) && $_SESSION['usuario']['perfil'] === 'a
 
                                     <form method="POST"
                                         action="<?= Config::getAppUrl() ?>App/Controller/ProjetoController.php"
-                                        onsubmit="return confirm('Tem certeza que deseja excluir o projeto \'<?= htmlspecialchars($projeto['nome_projeto']) ?>\'? Esta ação é irreversível.');">
+                                        onsubmit="return confirm('Tem certeza que deseja excluir o projeto \'<?= htmlspecialchars($projeto['nome_projeto'] ?? $projeto['NOME_PROJETO']) ?>\'? Esta ação é irreversível.');">
 
                                         <input type="hidden" name="action" value="excluir">
                                         <input type="hidden" name="projeto_id" value="<?= $projeto['projeto_id'] ?>">

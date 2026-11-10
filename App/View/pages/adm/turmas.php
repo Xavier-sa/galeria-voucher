@@ -87,8 +87,8 @@ $is_admin = isset($_SESSION['usuario']) && $_SESSION['usuario']['perfil'] === 'a
                                 <?php foreach ($turmas as $turma): ?>
                                     <tr>
                                         <td><?= htmlspecialchars($turma['turma_id']) ?></td>
-                                        <td><?= htmlspecialchars($turma['nome_turma']) ?></td>
-                                        <td><?= htmlspecialchars($turma['nome_polo']) ?></td>
+                                        <td><?= htmlspecialchars($turma['nome_turma'] ?? $turma['NOME_TURMA']) ?></td>
+                                        <td><?= htmlspecialchars($turma['nome_polo'] ?? $turma['NOME_POLO']) ?></td>
                                         <td class="acoes">
                                             <div class="acoes-container">
                                                 <a href="cadastroTurmas.php?turma_id=<?= $turma['turma_id'] ?>"
