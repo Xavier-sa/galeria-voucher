@@ -304,22 +304,9 @@ class PessoaModel extends BaseModel
     // Funcao para listamos 
     public function listarPerfisPermitidos(): array
     {
-        $sql = "SHOW COLUMNS FROM pessoa WHERE Field = 'perfil'";
-        $stmt = $this->pdo->query($sql);
-        $coluna = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if (!$coluna) return [];
-
-        preg_match("/^enum\((.*)\)$/", $coluna['Type'], $matches);
-
-        if (!isset($matches[1])) return [];
-
-        $valores = explode(',', $matches[1]);
-        $valores = array_map(function ($valor) {
-            return trim($valor, " '");
-        }, $valores);
-
-        return $valores;
+        // Os perfis são uma regra da aplicação. Não use SHOW COLUMNS aqui:
+        // esse comando é do MySQL e impede o cadastro quando o banco é Neon/PostgreSQL.
+        return ['aluno', 'professor', 'adm'];
     }
 
     /**

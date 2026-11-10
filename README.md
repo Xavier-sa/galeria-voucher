@@ -76,6 +76,23 @@ Acesse `http://localhost:8000`. O PHP precisa da extensão `pdo_pgsql` habilitad
 Preencha `DATABASE_URL` em `.env.local` com a connection string do Neon. Como
 alternativa, use as variáveis `DB_*`; `DB_SSLMODE=require` é obrigatório. Para Apache/XAMPP, `APP_URL=auto`
 detecta automaticamente o subdiretório do projeto.
+
+Valide a instalação e a conexão sem expor a senha:
+
+```bash
+php scripts/check-environment.php
+```
+
+## Publicação na Hostinger com Neon
+
+1. No hPanel, selecione PHP 8.1 ou superior e habilite `pdo_pgsql` e `pgsql`.
+2. Envie o conteúdo do projeto para `public_html` (ou para a subpasta desejada), incluindo `.htaccess`.
+3. Crie `.env` no diretório do projeto a partir de `.env.example`.
+4. Use a mesma `DATABASE_URL` fornecida pelo Neon e mantenha `DB_CONNECTION=pgsql` e `DB_SSLMODE=require`.
+5. Em produção, prefira definir `APP_URL=https://seu-dominio.com/`. Se publicar em subpasta, inclua-a, por exemplo `https://seu-dominio.com/galeria/`.
+6. Garanta permissão de gravação para a pasta `Uploads` (normalmente `755`; use `775` se exigido pelo servidor).
+
+O arquivo `.env` não deve ser enviado ao Git. O `.htaccess` incluído bloqueia seu acesso pela web e desativa a listagem de diretórios. No terminal SSH da Hostinger, execute `php scripts/check-environment.php` para conferir os requisitos e o acesso ao mesmo banco Neon usado localmente.
 ## 👥 Colaboradores
 [![Anuar El](https://github.com/AnuarRezz.png?size=50)](https://github.com/AnuarRezz)
 [![Bruno Ribeiro](https://github.com/brunoDevfull.png?size=50)](https://github.com/brunoDevfull)

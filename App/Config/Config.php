@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/Environment.php';
+
 class Config
 {
     private static ?array $settings = null;
@@ -17,13 +19,9 @@ class Config
             'DIR_USER' => 'App/View/pages/users/',
             'DIR_LOGOUT' => 'App/View/includes/',
         ];
-        $projectRoot = dirname(__DIR__, 2);
-        $envFile = is_file($projectRoot . '/.env.local') ? $projectRoot . '/.env.local' : $projectRoot . '/.env';
-        $fileSettings = is_file($envFile) ? (parse_ini_file($envFile, false, INI_SCANNER_RAW) ?: []) : [];
         self::$settings = $defaults;
         foreach ($defaults as $key => $default) {
-            $environmentValue = getenv($key);
-            self::$settings[$key] = $environmentValue !== false ? $environmentValue : ($fileSettings[$key] ?? $default);
+            self::$settings[$key] = Environment::get($key, $default);
         }
     }
 
@@ -35,9 +33,16 @@ class Config
 
     private static function detectAppUrl(): string
     {
-        $https = ($_SERVER['HTTPS'] ?? '') !== '' && ($_SERVER['HTTPS'] ?? '') !== 'off';
+        $forwardedProto = strtolower(trim(explode(',', $_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')[0]));
+        $https = $forwardedProto === 'https'
+            || (($_SERVER['HTTPS'] ?? '') !== '' && strtolower((string) $_SERVER['HTTPS']) !== 'off')
+            || (string) ($_SERVER['SERVER_PORT'] ?? '') === '443';
         $scheme = $https ? 'https' : 'http';
-        $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+        $forwardedHost = trim(explode(',', $_SERVER['HTTP_X_FORWARDED_HOST'] ?? '')[0]);
+        $host = $forwardedHost !== '' ? $forwardedHost : ($_SERVER['HTTP_HOST'] ?? 'localhost');
+        if (!preg_match('/^[a-z0-9.\-:\[\]]+$/i', $host)) {
+            $host = 'localhost';
+        }
         $documentRoot = realpath($_SERVER['DOCUMENT_ROOT'] ?? '') ?: '';
         $projectRoot = realpath(dirname(__DIR__, 2)) ?: '';
         $basePath = '';

@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/Environment.php';
+
 class Database
 {
     private static $instance = null;
@@ -6,12 +8,8 @@ class Database
 
     public function __construct()
     {
-        $projectRoot = dirname(__DIR__, 2);
-        $envFile = is_file($projectRoot . '/.env.local') ? $projectRoot . '/.env.local' : $projectRoot . '/.env';
-        $env = is_file($envFile) ? (parse_ini_file($envFile, false, INI_SCANNER_RAW) ?: []) : [];
-        $value = static function (string $key, string $default) use ($env): string {
-            $environmentValue = getenv($key);
-            return $environmentValue !== false ? $environmentValue : (string) ($env[$key] ?? $default);
+        $value = static function (string $key, string $default): string {
+            return (string) Environment::get($key, $default);
         };
 
         $host = $value('DB_HOST', '127.0.0.1');
@@ -19,9 +17,10 @@ class Database
         $dbname = $value('DB_DATABASE', 'galeria_voucher');
         $user = $value('DB_USERNAME', 'root');
         $pass = $value('DB_PASSWORD', '');
-        $connection = $value('DB_CONNECTION', 'pgsql');
+        $connection = strtolower($value('DB_CONNECTION', 'pgsql'));
         $sslmode = $value('DB_SSLMODE', 'require');
         $databaseUrl = $value('DATABASE_URL', '');
+        $connectionOptions = '';
 
         if ($connection !== 'pgsql') {
             throw new RuntimeException("DB_CONNECTION deve ser 'pgsql' para usar o Neon PostgreSQL.");
@@ -31,7 +30,8 @@ class Database
             throw new RuntimeException('O driver PDO PostgreSQL (pdo_pgsql) não está instalado ou habilitado no PHP.');
         }
 
-        if ($databaseUrl !== '') {
+        if (trim($databaseUrl) !== '') {
+            $databaseUrl = trim($databaseUrl, " \t\n\r\0\x0B\"'");
             $parts = parse_url($databaseUrl);
             if ($parts === false || !isset($parts['host'], $parts['path'], $parts['user'])) {
                 throw new RuntimeException('DATABASE_URL possui um formato inválido.');
@@ -39,18 +39,41 @@ class Database
 
             $host = $parts['host'];
             $port = (string) ($parts['port'] ?? 5432);
-            $dbname = ltrim($parts['path'], '/');
+            $dbname = rawurldecode(ltrim($parts['path'], '/'));
             $user = rawurldecode($parts['user']);
             $pass = rawurldecode($parts['pass'] ?? '');
 
             if (isset($parts['query'])) {
                 parse_str($parts['query'], $query);
                 $sslmode = (string) ($query['sslmode'] ?? $sslmode);
+                $connectionOptions = (string) ($query['options'] ?? '');
+            }
+        }
+
+        // Versões antigas da libpq (como algumas distribuídas com XAMPP) não
+        // suportam SNI. O Neon aceita o endpoint via options como fallback.
+        if ($connectionOptions === '' && str_ends_with(strtolower($host), '.neon.tech')) {
+            $endpoint = explode('.', $host, 2)[0];
+            $endpoint = preg_replace('/-pooler$/', '', $endpoint);
+            if (str_starts_with($endpoint, 'ep-')) {
+                $connectionOptions = 'endpoint=' . $endpoint;
             }
         }
 
         try {
-            $dsn = "pgsql:host={$host};port={$port};dbname={$dbname};sslmode={$sslmode}";
+            foreach (['host' => $host, 'port' => $port, 'dbname' => $dbname, 'sslmode' => $sslmode] as $name => $part) {
+                if ($part === '' || preg_match('/[;\r\n]/', $part)) {
+                    throw new RuntimeException("Configuração inválida para {$name}.");
+                }
+            }
+
+            $dsn = "pgsql:host={$host};port={$port};dbname={$dbname};sslmode={$sslmode};connect_timeout=10";
+            if ($connectionOptions !== '') {
+                if (preg_match('/[;\r\n]/', $connectionOptions)) {
+                    throw new RuntimeException('Configuração inválida para options.');
+                }
+                $dsn .= ";options='{$connectionOptions}'";
+            }
             $this->pdo = new PDO($dsn, $user, $pass, [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
