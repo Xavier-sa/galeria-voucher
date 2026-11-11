@@ -2,6 +2,7 @@
 .config
 .env
 .env.local
+.env.hostinger
 
 
 Uploads/*
@@ -10,3 +11,8 @@ uploads/*
 # Misc
 .vscode
 .idea
+
+# Arquivos locais ignorados
+.env.hostinger.example
+App/View/assets/img/avatares/avatar-anime-01.png
+SQL/hostinger/neon-para-mysql.sql
